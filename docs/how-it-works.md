@@ -24,6 +24,8 @@ audio renderer with its effects, mixed and played through Core Audio), the softw
 the movie decoder (VP9 through libvpx). A small number of fixed patches change the game itself, each checked against
 the original instructions first: frame timing by real time, the 60 FPS present interval, the output resolution.
 
+The RomFS backend accepts both `content:/Sound/...` and the stream player's `content://Sound/...` under the same mounted name. Repeated root separators are removed before looking up the indexed file; relative components and write opens are still rejected. Rejecting the stream form prevents full BWAV files from opening: a BGM can play its short BARS prefetch, then go silent and restart the same opening fragment every few seconds. `make -C games/totk probe-romfs-stream-paths` checks actual open/size/read operations across four 8 KiB blocks with a generated, game-free fixture, using both pread and mmap.
+
 ## The graphics (games/totk/third_party/d2r_gfx/gfx/nvn)
 
 The game records NVN commands (Nintendo's graphics API) into command buffers. The NVN layer implements the API on the

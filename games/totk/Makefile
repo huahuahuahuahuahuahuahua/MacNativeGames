@@ -345,3 +345,7 @@ build/texture-auto-layout-probe: tests/texture_auto_layout/probe.c third_party/d
 	xcrun clang -std=c11 -O2 -Wall -Wextra -Werror -Ithird_party/d2r_gfx/gfx/nvn -Ithird_party/d2r_gfx/gfx/tex tests/texture_auto_layout/probe.c third_party/d2r_gfx/gfx/nvn/nvn_tex.c third_party/d2r_gfx/gfx/tex/nvn_deswizzle.c -o "$@"
 probe-texture-auto-layout: build/texture-auto-layout-probe
 	build/texture-auto-layout-probe
+
+.PHONY: probe-romfs-stream-paths
+probe-romfs-stream-paths:
+	python3 tests/romfs_stream_paths/run.py

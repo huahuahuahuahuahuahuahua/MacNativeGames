@@ -190,7 +190,9 @@ void runtime_fs_init(void) {
 static int path_ok(const char *p) {if(!p||!*p||*p=='/'||strchr(p,'\\'))return 0;const char *q=p;while(*q){const char *e=strchr(q,'/');size_t n=e?(size_t)(e-q):strlen(q);if(!n||(n==1&&q[0]=='.')||(n==2&&q[0]=='.'&&q[1]=='.'))return 0;if(!e)break;q=e+1;}return 1;}
 static const char *rom_path(const char *path) {
  size_t n=strlen(mount_name);if(!n||!path||strncmp(path,mount_name,n)||path[n]!=':'||path[n+1]!='/')return NULL;
- path+=n+2;return path_ok(path)?path:NULL;
+ /* The SDK accepts repeated root separators. TOTK's stream player opens
+    content://Sound/... while its resource loader opens content:/Sound/.... */
+ path+=n+2;while(*path=='/')path++;return path_ok(path)?path:NULL;
 }
 static uint64_t lower(const char *name) {uint64_t lo=0,hi=file_count;while(lo<hi){uint64_t m=lo+(hi-lo)/2;if(strcmp(entry_name(entry(m)),name)<0)lo=m+1;else hi=m;}return lo;}
 static unsigned mount_rom(const char *name,void *cache,uint64_t size) {

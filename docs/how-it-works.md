@@ -37,6 +37,12 @@ service that turns each request into the MSL and its reflection file), compiled 
 ships ready-made in `games/totk/prebuilt/macos-arm64`, so neither building nor playing needs .NET, and playing needs no Python. Building still requires Python 3.14. MetalFX upscales the game's 1600x900 scene into its
 1080p or 1440p canvas and can generate in-between frames.
 
+## Texture storage layout
+
+Automatic block height follows NVN's integer rounding: truncate `height_in_blocks * 1.5 / 8` before choosing the GOB power of two. The deko3d heuristic rounds that division up, which differs at several dimension boundaries. For the shrine warp pad's 160×160 BC3-sRGB texture, the wrong H3 layout reads padding as black texels; NVN uses H2. The allocation size is 57,344 bytes in both cases, so a size check alone cannot catch this error. Explicit packaged layouts continue to override the automatic choice.
+
+The correction was compared against the original SDK's CPU metadata functions for 40 uncompressed/BC3 boundary cases, including every mip's offset and block height: 16 mismatches before, none after. The asset's base mip and the running 1.1.2 shrine scene also confirmed the correction. These scoped checks do not establish whole-game rendering correctness. Run the game-data-free regression with `make -C games/totk probe-texture-auto-layout`; its expected sizes and block heights are independent SDK query results.
+
 ## The build (build_app.py)
 
 1. Detect XCI (HFS0 secure partition) or NSP (PFS0) by its header. Read the base Program NCA in place, extract ExeFS,
